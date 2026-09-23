@@ -39,7 +39,7 @@ export default function Contact() {
     setFormStatus("Ihre Anfrage wird gesendet...");
 
     try {
-      const response = await fetch("https://formsubmit.co/ajax/eerjona.rushiti@gmail.com", {
+      const response = await fetch("https://formsubmit.co/ajax/info@alphareifen.com", {
         method: "POST",
         headers: {
           Accept: "application/json",
@@ -65,7 +65,7 @@ export default function Contact() {
         ].join("\n"),
       );
 
-      window.location.href = `mailto:eerjona.rushiti@gmail.com?subject=${subject}&body=${body}`;
+      window.location.href = `mailto:info@alphareifen.com?subject=${subject}&body=${body}`;
       setFormStatus("Ihr E-Mail-Programm wurde geöffnet. Bitte die Nachricht dort absenden.");
     } finally {
       setIsSubmitting(false);
