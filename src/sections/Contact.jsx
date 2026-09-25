@@ -62,7 +62,7 @@ export default function Contact() {
         <form
           ref={formRef}
           className="contact-form"
-          action="https://formsubmit.co/info@alphareifen.com"
+          action="https://formsubmit.co/eerjona.rushiti@gmail.com"
           method="POST"
           encType="multipart/form-data"
           target="formsubmit-frame"
