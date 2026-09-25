@@ -474,6 +474,49 @@ footer p {
   box-shadow: 0 0 0 4px rgba(255, 106, 0, 0.11);
 }
 
+.file-field {
+  display: grid;
+  gap: 10px;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.file-picker {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.file-picker-button {
+  flex: 0 0 auto;
+  border-radius: 8px;
+  background: var(--orange);
+  color: #fff;
+  cursor: pointer;
+  padding: 10px 14px;
+  font-weight: 800;
+}
+
+.file-picker-name {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.contact-form .file-input {
+  position: absolute;
+  width: 1px !important;
+  height: 1px;
+  border: 0;
+  padding: 0;
+  opacity: 0;
+}
+
 .form-hidden {
   display: none;
 }
@@ -499,6 +542,15 @@ footer p {
   color: var(--muted);
   font-size: 15px;
   line-height: 1.5;
+}
+
+.form-status.success {
+  color: #61d394;
+  font-weight: 700;
+}
+
+.form-submit-frame {
+  display: none;
 }
 
 .map-frame {

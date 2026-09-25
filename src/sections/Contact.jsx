@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Icon from "../components/Icon.jsx";
 import SectionTitle from "../components/SectionTitle.jsx";
 
@@ -17,59 +17,25 @@ function ContactItem({ icon, title, children }) {
 }
 
 export default function Contact() {
+  const formRef = useRef(null);
   const [formStatus, setFormStatus] = useState("");
+  const [fileName, setFileName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  async function handleSubmit(event) {
-    event.preventDefault();
+  function handleSubmit() {
+    setIsSubmitting(true);
+    setFormStatus("Ihre Anfrage wird gesendet...");
+  }
 
-    const form = event.currentTarget;
-    const formData = new FormData(form);
-    const name = formData.get("Name")?.trim();
-    const email = formData.get("E-Mail")?.trim();
-    const subjectLine = formData.get("Betreff")?.trim();
-    const message = formData.get("Nachricht")?.trim();
-
-    if (!name || !email || !subjectLine || !message) {
-      setFormStatus("Bitte Name, E-Mail, Betreff und Nachricht ausfüllen.");
+  function handleFormSubmitLoad() {
+    if (!isSubmitting) {
       return;
     }
 
-    setIsSubmitting(true);
-    setFormStatus("Ihre Anfrage wird gesendet...");
-
-    try {
-      const response = await fetch("https://formsubmit.co/ajax/info@alphareifen.com", {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-        },
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error("Die Anfrage konnte nicht automatisch gesendet werden.");
-      }
-
-      form.reset();
-      setFormStatus("Danke. Ihre Nachricht wurde gesendet.");
-    } catch (error) {
-      const subject = encodeURIComponent(subjectLine || "Neue Nachricht von alphareifen.com");
-      const body = encodeURIComponent(
-        [
-          `Name: ${name}`,
-          `E-Mail: ${email}`,
-          `Betreff: ${subjectLine}`,
-          "",
-          `Nachricht: ${message}`,
-        ].join("\n"),
-      );
-
-      window.location.href = `mailto:info@alphareifen.com?subject=${subject}&body=${body}`;
-      setFormStatus("Ihr E-Mail-Programm wurde geöffnet. Bitte die Nachricht dort absenden.");
-    } finally {
-      setIsSubmitting(false);
-    }
+    formRef.current?.reset();
+    setFileName("");
+    setIsSubmitting(false);
+    setFormStatus("Vielen Dank. Ihre Terminanfrage wurde erfolgreich gesendet.");
   }
 
   return (
@@ -93,21 +59,55 @@ export default function Contact() {
             <p>Sa: 09:00 - 13:00 Uhr</p>
           </ContactItem>
         </div>
-        <form className="contact-form" onSubmit={handleSubmit}>
+        <form
+          ref={formRef}
+          className="contact-form"
+          action="https://formsubmit.co/info@alphareifen.com"
+          method="POST"
+          encType="multipart/form-data"
+          target="formsubmit-frame"
+          onSubmit={handleSubmit}
+        >
           <input type="hidden" name="_subject" value="Neue Terminanfrage von alphareifen.com" />
           <input type="hidden" name="_template" value="table" />
           <input type="hidden" name="_captcha" value="false" />
           <input type="text" name="_honey" tabIndex="-1" autoComplete="off" className="form-hidden" />
 
-          <input type="text" name="Name" placeholder="Ihr Name" autoComplete="name" />
-          <input type="email" name="E-Mail" placeholder="Ihre E-Mail" autoComplete="email" />
+          <input type="text" name="Name" placeholder="Ihr Name" autoComplete="name" required />
+          <input type="email" name="E-Mail" placeholder="Ihre E-Mail" autoComplete="email" required />
+          <input type="tel" name="Telefonnummer" placeholder="Telefonnummer" autoComplete="tel" required />
           <input type="text" name="Betreff" placeholder="Betreff" />
           <textarea rows="6" name="Nachricht" placeholder="Ihre Nachricht" />
+          <label className="file-field">
+            <span>Fahrzeugschein</span>
+            <span className="file-picker">
+              <span className="file-picker-button">Datei auswählen</span>
+              <span className="file-picker-name">{fileName || "Keine Datei ausgewählt"}</span>
+            </span>
+            <input
+              className="file-input"
+              type="file"
+              name="attachment"
+              accept="image/png, image/jpeg"
+              onChange={(event) => setFileName(event.target.files?.[0]?.name || "")}
+            />
+          </label>
           <button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "WIRD GESENDET..." : "NACHRICHT SENDEN"}
+            {isSubmitting ? "WIRD GESENDET..." : "TERMINANFRAGE SENDEN"}
           </button>
-          {formStatus ? <p className="form-status">{formStatus}</p> : null}
+          {formStatus ? (
+            <p className={`form-status ${formStatus.startsWith("Vielen Dank") ? "success" : ""}`}>
+              {formStatus}
+            </p>
+          ) : null}
         </form>
+        <iframe
+          title="FormSubmit Antwort"
+          name="formsubmit-frame"
+          className="form-submit-frame"
+          onLoad={handleFormSubmitLoad}
+          aria-hidden="true"
+        />
       </div>
       <div className="map-frame">
         <iframe
